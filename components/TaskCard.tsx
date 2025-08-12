@@ -14,7 +14,7 @@ interface Props {
   variant?: "backlog" | "scheduled";
   compact?: boolean;
   className?: string;
-  suppressScheduledStamp?: boolean; // no mostrar 'Programada ...'
+  suppressScheduledStamp?: boolean;
 }
 
 export function TaskCard({
@@ -106,8 +106,8 @@ export function TaskCard({
       onDragEnd={onDragEnd}
       className={cn(
         "group relative rounded-md border border-neutral-200/60 dark:border-neutral-700/60 bg-white dark:bg-neutral-800 shadow-subtle px-2 py-1.5 flex gap-2 text-sm hover:border-brand-300 dark:hover:border-brand-600 cursor-grab active:cursor-grabbing select-none focus:outline-none focus:ring-2 focus:ring-brand-500 min-w-0",
-        task.status === "done" && "opacity-60 line-through",
-        variant === "scheduled" && "bg-brand-50 dark:bg-neutral-800",
+        task.status === "done" && "bg-brand-50 opacity-60 line-through",
+        variant === "scheduled" && "dark:bg-neutral-800",
         (dueSoon || overdue) && "pr-8",
         isDragging && "opacity-40",
         editing && "cursor-text",

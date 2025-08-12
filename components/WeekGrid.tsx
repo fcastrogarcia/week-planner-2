@@ -11,7 +11,7 @@ interface Props {
   days: Date[];
 }
 
-const HOURS = Array.from({ length: 14 }, (_, i) => i + 7); // 07:00 - 20:00
+const HOURS = Array.from({ length: 17 }, (_, i) => i + 7); // 07:00 - 23:00
 
 export function WeekGrid({ days }: Props) {
   const { tasks, updateTask } = useTasks();
@@ -148,7 +148,7 @@ export function WeekGrid({ days }: Props) {
                 {/* Sin hora: fila 1 */}
                 <div
                   style={{ gridColumn: dayIdx + 2, gridRow: 1 }}
-                  className={`px-1 pt-2 pb-2 bg-neutral-50/60 dark:bg-neutral-800/40 border-b border-neutral-100 dark:border-neutral-800 transition-colors rounded-b-sm min-w-0 ${
+                  className={`bg-neutral-50/60 dark:bg-neutral-800/40 border-b border-neutral-100 dark:border-neutral-800 transition-colors rounded-b-sm min-w-0 ${
                     hoveredSlot === `${iso}-unscheduled`
                       ? "outline outline-1 outline-brand-400/70 bg-brand-50/60 dark:bg-brand-400/10 z-10"
                       : ""
@@ -172,7 +172,7 @@ export function WeekGrid({ days }: Props) {
                     }
                   }}
                 >
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-1 px-1 pt-2">
                     <span className="text-[10px] uppercase tracking-wide text-neutral-400 font-medium">
                       Sin hora
                     </span>
@@ -193,7 +193,7 @@ export function WeekGrid({ days }: Props) {
                         ? ""
                         : undefined
                     }
-                    className="space-y-1 min-h-[40px] min-w-0 overflow-hidden"
+                    className="space-y-1 min-h-[40px] min-w-0 px-1 pb-1"
                   >
                     {unscheduled.map((t) => (
                       <TaskCard key={t.id} task={t} variant="backlog" suppressScheduledStamp />
@@ -285,8 +285,8 @@ export function WeekGrid({ days }: Props) {
         </div>
         {hasBottomOverflow && (
           <div
-            className="pointer-events-none fixed h-12 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent flex items-end justify-center pb-1 z-50"
-            style={{ left: badgeRect.left, width: badgeRect.width, bottom: badgeRect.bottom + 12 }}
+            className="pointer-events-none fixed h-12 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent flex items-end justify-center pb-3 z-50"
+            style={{ left: badgeRect.left, width: badgeRect.width, bottom: badgeRect.bottom }}
           >
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-200/70 dark:bg-neutral-700/60 text-neutral-600 dark:text-neutral-300">
               Más tareas abajo

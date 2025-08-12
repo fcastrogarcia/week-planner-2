@@ -50,7 +50,7 @@ export function BacklogPanel({ className }: Props) {
           <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
             <p className="text-[10px] uppercase tracking-wide text-neutral-400 mb-1">Programadas</p>
             {scheduledButPending.map((t) => (
-              <TaskCard key={t.id} task={t} variant="backlog" compact />
+              <TaskCard key={t.id} task={t} variant="backlog" compact className="mb-1" />
             ))}
           </div>
         )}
