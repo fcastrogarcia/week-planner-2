@@ -15,6 +15,7 @@ interface Props {
   compact?: boolean;
   className?: string;
   suppressScheduledStamp?: boolean;
+  disableDrag?: boolean;
 }
 
 export function TaskCard({
@@ -23,6 +24,7 @@ export function TaskCard({
   compact,
   className,
   suppressScheduledStamp,
+  disableDrag,
 }: Props) {
   const { updateTask, deleteTask } = useTasks();
   const [showDuePicker, setShowDuePicker] = useState(false);
@@ -43,7 +45,7 @@ export function TaskCard({
       : 1;
 
   const onDragStart = (e: React.DragEvent) => {
-    if (editing) {
+    if (editing || disableDrag) {
       e.preventDefault();
       return;
     }
@@ -106,11 +108,13 @@ export function TaskCard({
 
   return (
     <div
-      draggable={!editing}
+      draggable={!editing && !disableDrag}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       className={cn(
-        "group relative rounded-md border border-neutral-200/60 dark:border-neutral-700/60 bg-white dark:bg-neutral-800 shadow-subtle px-2 py-1.5 flex gap-2 text-sm hover:border-brand-300 dark:hover:border-brand-600 cursor-grab active:cursor-grabbing select-none focus:outline-none focus:ring-2 focus:ring-brand-500 min-w-0",
+        "group relative rounded-md border border-neutral-200/60 dark:border-neutral-700/60 bg-white dark:bg-neutral-800 shadow-subtle px-2 py-1.5 flex gap-2 text-sm select-none focus:outline-none focus:ring-2 focus:ring-brand-500 min-w-0",
+        !disableDrag && "hover:border-brand-300 dark:hover:border-brand-600",
+        !editing && (disableDrag ? "cursor-default" : "cursor-grab active:cursor-grabbing"),
         task.status === "done" && "bg-brand-50 opacity-60 line-through",
         variant === "scheduled" && "bg-brand-50 dark:bg-neutral-800",
         (dueSoon || overdue) && "pr-8",
@@ -208,7 +212,7 @@ export function TaskCard({
       <div
         className={cn(
           "absolute transition-opacity top-0 right-0 translate-y-[-50%] flex gap-1 pr-1",
-          editing ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          editing ? "opacity-100" : disableDrag ? "opacity-0" : "opacity-0 group-hover:opacity-100"
         )}
       >
         <button

@@ -302,7 +302,12 @@ export function WeekGrid({ days }: Props) {
                       data-task-overlay=""
                       className="px-1 py-0.5 z-10 min-w-0 relative"
                     >
-                      <TaskCard task={t} variant="scheduled" className="h-full" />
+                      <TaskCard
+                        task={t}
+                        variant="scheduled"
+                        className="h-full"
+                        disableDrag={resizing?.taskId === t.id}
+                      />
                       {/* Handle de resize inferior */}
                       <div
                         onMouseDown={(e) => onResizeMouseDown(e, t.id, t.scheduledTime as string)}
