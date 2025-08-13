@@ -36,6 +36,11 @@ export function TaskCard({
   const daysLeft = due ? differenceInCalendarDays(due, today) : null;
   const dueSoon = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
   const overdue = due ? isPast(due) && daysLeft !== 0 : false;
+  const isScheduled = variant === "scheduled";
+  const slots =
+    task.scheduledDate && task.scheduledTime
+      ? Math.max(1, Math.ceil(((task.durationMin ?? 30) as number) / 30))
+      : 1;
 
   const onDragStart = (e: React.DragEvent) => {
     if (editing) {
@@ -107,7 +112,7 @@ export function TaskCard({
       className={cn(
         "group relative rounded-md border border-neutral-200/60 dark:border-neutral-700/60 bg-white dark:bg-neutral-800 shadow-subtle px-2 py-1.5 flex gap-2 text-sm hover:border-brand-300 dark:hover:border-brand-600 cursor-grab active:cursor-grabbing select-none focus:outline-none focus:ring-2 focus:ring-brand-500 min-w-0",
         task.status === "done" && "bg-brand-50 opacity-60 line-through",
-        variant === "scheduled" && "dark:bg-neutral-800",
+        variant === "scheduled" && "bg-brand-50 dark:bg-neutral-800",
         (dueSoon || overdue) && "pr-8",
         isDragging && "opacity-40",
         editing && "cursor-text",
@@ -121,7 +126,7 @@ export function TaskCard({
         onClick={() => updateTask(task.id, { status: task.status === "done" ? "pending" : "done" })}
         className="mt-0.5 shrink-0"
       />
-      <div className="min-w-0 flex-1 overflow-hidden">
+      <div className="min-w-0 flex-1 overflow-hidden flex flex-col">
         {editing ? (
           <form
             onSubmit={(e) => {
@@ -147,12 +152,39 @@ export function TaskCard({
             />
           </form>
         ) : (
-          <div className="font-medium truncate" title={task.title}>
+          <div
+            className={cn(
+              "font-medium",
+              isScheduled
+                ? slots <= 1
+                  ? "truncate"
+                  : slots === 2
+                  ? "line-clamp-2"
+                  : slots === 3
+                  ? "line-clamp-3"
+                  : undefined
+                : "truncate"
+            )}
+            title={task.title}
+          >
             {task.title}
           </div>
         )}
         {task.description && !compact && (
-          <div className="text-xs text-neutral-500 line-clamp-2 whitespace-pre-wrap break-words">
+          <div
+            className={cn(
+              "text-xs text-neutral-500 whitespace-pre-wrap break-words",
+              isScheduled
+                ? slots === 1
+                  ? "hidden"
+                  : slots === 2
+                  ? "line-clamp-1"
+                  : slots === 3
+                  ? "line-clamp-3"
+                  : undefined
+                : "line-clamp-2"
+            )}
+          >
             {task.description}
           </div>
         )}

@@ -5,6 +5,7 @@ import { TaskCard } from "./TaskCard";
 import { TaskInlineCreator } from "./TaskInlineCreator";
 import { useState, useRef, useEffect, useCallback, Fragment } from "react";
 import { useDnd } from "@/context/dnd";
+import { useTaskResize } from "@/hooks/useTaskResize";
 import { useTasks } from "@/hooks/useTasks";
 
 interface Props {
@@ -25,6 +26,12 @@ export function WeekGrid({ days }: Props) {
     width: 0,
     bottom: 0,
   });
+  const { resizing, onResizeMouseDown, computeRowPlacement } = useTaskResize({
+    tasks,
+    updateTask,
+    hoursStart: HOURS[0],
+    hoursLength: HOURS.length,
+  });
 
   function openCreator(dayISO: string, hour?: number, minute: number = 0) {
     let time: string | undefined = undefined;
@@ -37,7 +44,9 @@ export function WeekGrid({ days }: Props) {
   }
 
   const recomputeOverflowWindow = useCallback(() => {
-    const nodes = document.querySelectorAll("[data-slot-has-tasks], [data-unscheduled-has-tasks]");
+    const nodes = document.querySelectorAll(
+      "[data-slot-has-tasks], [data-unscheduled-has-tasks], [data-task-overlay]"
+    );
     const doc = document.documentElement;
     const viewportBottom = doc.clientHeight + window.scrollY;
     let maxBottom = 0;
@@ -89,7 +98,7 @@ export function WeekGrid({ days }: Props) {
 
   useEffect(() => {
     requestAnimationFrame(() => recomputeOverflowWindow());
-  }, [tasks, inlineCreator, recomputeOverflowWindow]);
+  }, [tasks, inlineCreator, recomputeOverflowWindow, resizing]);
 
   return (
     <div className="flex flex-col h-full">
@@ -115,6 +124,7 @@ export function WeekGrid({ days }: Props) {
             gridTemplateRows: `auto repeat(${HOURS.length * 2}, 40px)`,
           }}
         >
+          {/* Columna de horas */}
           <div
             className="border-b border-neutral-100 dark:border-neutral-800"
             style={{ gridColumn: 1, gridRow: 1 }}
@@ -128,11 +138,14 @@ export function WeekGrid({ days }: Props) {
               {String(h).padStart(2, "0")}:00
             </div>
           ))}
+
+          {/* Columnas por día */}
           {days.map((day, dayIdx) => {
             const iso = format(day, "yyyy-MM-dd");
             const dayTasks = tasks.filter((t) => t.scheduledDate === iso);
             const timed = dayTasks.filter((t) => t.scheduledTime);
             const unscheduled = dayTasks.filter((t) => !t.scheduledTime);
+
             return (
               <Fragment key={iso}>
                 {/* Overlay de bordes verticales de la columna */}
@@ -145,6 +158,7 @@ export function WeekGrid({ days }: Props) {
                       : "")
                   }
                 />
+
                 {/* Sin hora: fila 1 */}
                 <div
                   style={{ gridColumn: dayIdx + 2, gridRow: 1 }}
@@ -153,7 +167,7 @@ export function WeekGrid({ days }: Props) {
                       ? "outline outline-1 outline-brand-400/70 bg-brand-50/60 dark:bg-brand-400/10 z-10"
                       : ""
                   }`}
-                  onDragEnter={(e) => {
+                  onDragEnter={() => {
                     if (dragging?.type === "task") setHoveredSlot(`${iso}-unscheduled`);
                   }}
                   onDragOver={(e) => {
@@ -207,16 +221,17 @@ export function WeekGrid({ days }: Props) {
                     )}
                   </div>
                 </div>
-                {/* Slots horarios */}
+
+                {/* Slots horarios (dropzones y sumar) */}
                 {HOURS.map((h, i) => {
                   const hourStr = String(h).padStart(2, "0");
                   const subSlots: Array<"00" | "30"> = ["00", "30"];
                   return subSlots.map((mm, idx) => {
                     const timeStr = `${hourStr}:${mm}`;
-                    const slotTasks = timed.filter((t) => t.scheduledTime === timeStr);
+                    const row = 2 + i * 2 + idx;
                     const isCreator =
                       inlineCreator && inlineCreator.day === iso && inlineCreator.time === timeStr;
-                    const row = 2 + i * 2 + idx;
+
                     return (
                       <div
                         key={`${iso}-${h}-${mm}`}
@@ -228,8 +243,8 @@ export function WeekGrid({ days }: Props) {
                             ? "outline outline-1 outline-brand-400/70 bg-brand-50/50 dark:bg-brand-400/10 z-10"
                             : ""
                         }`}
-                        data-slot-has-tasks={slotTasks.length || isCreator ? "" : undefined}
-                        onDragEnter={(e) => {
+                        data-slot-has-tasks={isCreator ? "" : undefined}
+                        onDragEnter={() => {
                           if (dragging?.type === "task") setHoveredSlot(`${iso}-${timeStr}`);
                         }}
                         onDragOver={(e) => {
@@ -254,9 +269,6 @@ export function WeekGrid({ days }: Props) {
                       >
                         <div className="absolute inset-0 group-hover/half:bg-brand-50/30 dark:group-hover/half:bg-neutral-800/30 pointer-events-none transition" />
                         <div className="space-y-1 min-w-0">
-                          {slotTasks.map((t) => (
-                            <TaskCard key={t.id} task={t} variant="scheduled" />
-                          ))}
                           {isCreator ? (
                             <TaskInlineCreator
                               scheduledDate={iso}
@@ -279,10 +291,32 @@ export function WeekGrid({ days }: Props) {
                     );
                   });
                 })}
+
+                {/* Overlays de tareas programadas que spanean filas */}
+                {timed.map((t) => {
+                  const { rowStart, rowSpan } = computeRowPlacement(t);
+                  return (
+                    <div
+                      key={`ovl-${t.id}`}
+                      style={{ gridColumn: dayIdx + 2, gridRow: `${rowStart} / span ${rowSpan}` }}
+                      data-task-overlay=""
+                      className="px-1 py-0.5 z-10 min-w-0 relative"
+                    >
+                      <TaskCard task={t} variant="scheduled" className="h-full" />
+                      {/* Handle de resize inferior */}
+                      <div
+                        onMouseDown={(e) => onResizeMouseDown(e, t.id, t.scheduledTime as string)}
+                        className="absolute left-1 right-1 bottom-1 h-2 cursor-ns-resize rounded-sm bg-neutral-300/50 dark:bg-neutral-600/50 opacity-0 hover:opacity-100"
+                        title="Arrastrar para cambiar duración"
+                      />
+                    </div>
+                  );
+                })}
               </Fragment>
             );
           })}
         </div>
+
         {hasBottomOverflow && (
           <div
             className="pointer-events-none fixed h-12 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent flex items-end justify-center pb-3 z-50"
