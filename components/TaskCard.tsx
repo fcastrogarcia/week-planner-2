@@ -8,31 +8,38 @@ import { useTasks } from "@/hooks/useTasks";
 import { useDnd } from "@/context/dnd";
 import { X, Calendar } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useClickAway } from "@/hooks/useClickAwayt";
 
 interface Props {
   task: Task;
   variant?: "backlog" | "scheduled";
   compact?: boolean;
   className?: string;
-  suppressScheduledStamp?: boolean;
   disableDrag?: boolean;
 }
 
-export function TaskCard({
-  task,
-  variant = "backlog",
-  compact,
-  className,
-  suppressScheduledStamp,
-  disableDrag,
-}: Props) {
+function createGhost(title: string) {
+  const ghost = document.createElement("div");
+  ghost.textContent = title;
+  ghost.style.cssText =
+    "position:fixed;top:-1000px;left:-1000px;max-width:220px;padding:4px 8px;font-size:12px;font-weight:500;border-radius:6px;background:#2563eb;color:white;box-shadow:0 4px 10px rgba(0,0,0,0.25);white-space:nowrap;pointer-events:none;font-family:inherit;";
+  document.body.appendChild(ghost);
+  return ghost;
+}
+
+export function TaskCard({ task, variant = "backlog", compact, className, disableDrag }: Props) {
   const { updateTask, deleteTask } = useTasks();
+
   const [showDuePicker, setShowDuePicker] = useState(false);
   const pickerRef = useRef<HTMLDivElement | null>(null);
+  useClickAway(pickerRef, () => setShowDuePicker(false));
+
   const { startDrag, endDrag, dragging } = useDnd();
+
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(task.title);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
   const due = task.dueDate ? parseISO(task.dueDate) : null;
   const today = new Date();
   const daysLeft = due ? differenceInCalendarDays(due, today) : null;
@@ -57,12 +64,9 @@ export function TaskCard({
       taskId: task.id,
       from: { date: task.scheduledDate || null, time: task.scheduledTime || null },
     });
-    // Drag image compacta
-    const ghost = document.createElement("div");
-    ghost.textContent = task.title;
-    ghost.style.cssText =
-      "position:fixed;top:-1000px;left:-1000px;max-width:220px;padding:4px 8px;font-size:12px;font-weight:500;border-radius:6px;background:#2563eb;color:white;box-shadow:0 4px 10px rgba(0,0,0,0.25);white-space:nowrap;pointer-events:none;font-family:inherit;";
-    document.body.appendChild(ghost);
+
+    const ghost = createGhost(task.title);
+
     e.dataTransfer.setDragImage(
       ghost,
       Math.min(ghost.clientWidth, 220) / 2,
@@ -74,6 +78,7 @@ export function TaskCard({
   };
   const onDragEnd = () => endDrag();
   const isDragging = dragging?.taskId === task.id;
+
   useEffect(() => {
     if (editing) {
       setDraft(task.title);
@@ -90,18 +95,6 @@ export function TaskCard({
     setDraft(task.title);
     setEditing(false);
   }
-
-  useEffect(() => {
-    if (!showDuePicker) return;
-    function onDoc(e: MouseEvent) {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-        setShowDuePicker(false);
-      }
-    }
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [showDuePicker]);
-
   function handleDueChange(val: string) {
     updateTask(task.id, { dueDate: val || undefined });
   }
@@ -192,7 +185,7 @@ export function TaskCard({
             {task.description}
           </div>
         )}
-        {variant === "backlog" && task.scheduledDate && !suppressScheduledStamp && (
+        {variant === "backlog" && task.scheduledDate && (
           <div className="text-[10px] uppercase tracking-wide text-neutral-400 mt-0.5">
             Programada {format(parseISO(task.scheduledDate), "EEE d", { locale: es })}
             {task.scheduledTime && ` ${task.scheduledTime}`}

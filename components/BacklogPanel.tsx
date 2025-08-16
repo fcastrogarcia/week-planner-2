@@ -3,7 +3,6 @@ import { useTasks } from "@/hooks/useTasks";
 import { TaskCard } from "./TaskCard";
 import { TaskInlineCreator } from "./TaskInlineCreator";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { useDnd } from "@/context/dnd";
 
 interface Props {
@@ -13,7 +12,6 @@ interface Props {
 export function BacklogPanel({ className }: Props) {
   const { tasks, updateTask } = useTasks();
   const { dragging, endDrag } = useDnd();
-  const [showCreator, setShowCreator] = useState(true);
   const backlog = tasks.filter((t) => !t.scheduledDate);
   const scheduledButPending = tasks.filter((t) => t.scheduledDate && t.status !== "done");
 
@@ -37,7 +35,7 @@ export function BacklogPanel({ className }: Props) {
           }
         }}
       >
-        {showCreator && <TaskInlineCreator placeholder="Agregar al backlog…" />}
+        <TaskInlineCreator placeholder="Agregar al backlog…" />
         {backlog.length === 0 && (
           <p className="text-xs text-neutral-400">Sin tareas pendientes en backlog.</p>
         )}

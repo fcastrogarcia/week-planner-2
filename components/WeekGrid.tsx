@@ -210,7 +210,7 @@ export function WeekGrid({ days }: Props) {
                     className="space-y-1 min-h-[40px] min-w-0 px-1 pb-1"
                   >
                     {unscheduled.map((t) => (
-                      <TaskCard key={t.id} task={t} variant="backlog" suppressScheduledStamp />
+                      <TaskCard key={t.id} task={t} variant="backlog" />
                     ))}
                     {inlineCreator && inlineCreator.day === iso && !inlineCreator.time && (
                       <TaskInlineCreator
