@@ -1,33 +1,33 @@
-"use client";
-import { Task } from "@/types/task";
-import { Checkbox } from "./ui/Checkbox";
-import { cn } from "@/lib/utils";
-import { format, differenceInCalendarDays, isPast, parseISO } from "date-fns";
-import { es } from "date-fns/locale";
-import { useTasks } from "@/hooks/useTasks";
-import { useDnd } from "@/context/dnd";
-import { X, Calendar } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { useClickAway } from "@/hooks/useClickAwayt";
+'use client';
+import { Task } from '@/types/task';
+import { Checkbox } from './ui/Checkbox';
+import { cn } from '@/lib/utils';
+import { format, differenceInCalendarDays, isPast, parseISO } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { useTasks } from '@/hooks/useTasks';
+import { useDnd } from '@/context/dnd';
+import { X, Calendar } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useClickAway } from '@/hooks/useClickAway';
 
 interface Props {
   task: Task;
-  variant?: "backlog" | "scheduled";
+  variant?: 'backlog' | 'scheduled';
   compact?: boolean;
   className?: string;
   disableDrag?: boolean;
 }
 
 function createGhost(title: string) {
-  const ghost = document.createElement("div");
+  const ghost = document.createElement('div');
   ghost.textContent = title;
   ghost.style.cssText =
-    "position:fixed;top:-1000px;left:-1000px;max-width:220px;padding:4px 8px;font-size:12px;font-weight:500;border-radius:6px;background:#2563eb;color:white;box-shadow:0 4px 10px rgba(0,0,0,0.25);white-space:nowrap;pointer-events:none;font-family:inherit;";
+    'position:fixed;top:-1000px;left:-1000px;max-width:220px;padding:4px 8px;font-size:12px;font-weight:500;border-radius:6px;background:#2563eb;color:white;box-shadow:0 4px 10px rgba(0,0,0,0.25);white-space:nowrap;pointer-events:none;font-family:inherit;';
   document.body.appendChild(ghost);
   return ghost;
 }
 
-export function TaskCard({ task, variant = "backlog", compact, className, disableDrag }: Props) {
+export function TaskCard({ task, variant = 'backlog', compact, className, disableDrag }: Props) {
   const { updateTask, deleteTask } = useTasks();
 
   const [showDuePicker, setShowDuePicker] = useState(false);
@@ -45,11 +45,9 @@ export function TaskCard({ task, variant = "backlog", compact, className, disabl
   const daysLeft = due ? differenceInCalendarDays(due, today) : null;
   const dueSoon = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
   const overdue = due ? isPast(due) && daysLeft !== 0 : false;
-  const isScheduled = variant === "scheduled";
+  const isScheduled = variant === 'scheduled';
   const slots =
-    task.scheduledDate && task.scheduledTime
-      ? Math.max(1, Math.ceil(((task.durationMin ?? 30) as number) / 30))
-      : 1;
+    task.scheduledDate && task.scheduledTime ? Math.max(1, Math.ceil(((task.durationMin ?? 30) as number) / 30)) : 1;
 
   const onDragStart = (e: React.DragEvent) => {
     if (editing || disableDrag) {
@@ -57,21 +55,17 @@ export function TaskCard({ task, variant = "backlog", compact, className, disabl
       return;
     }
     e.stopPropagation();
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", task.id);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', task.id);
     startDrag({
-      type: "task",
+      type: 'task',
       taskId: task.id,
       from: { date: task.scheduledDate || null, time: task.scheduledTime || null },
     });
 
     const ghost = createGhost(task.title);
 
-    e.dataTransfer.setDragImage(
-      ghost,
-      Math.min(ghost.clientWidth, 220) / 2,
-      ghost.clientHeight / 2
-    );
+    e.dataTransfer.setDragImage(ghost, Math.min(ghost.clientWidth, 220) / 2, ghost.clientHeight / 2);
     setTimeout(() => {
       if (ghost.parentNode) ghost.parentNode.removeChild(ghost);
     }, 0);
@@ -105,22 +99,22 @@ export function TaskCard({ task, variant = "backlog", compact, className, disabl
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       className={cn(
-        "group relative rounded-md border border-neutral-200/60 dark:border-neutral-700/60 bg-white dark:bg-neutral-800 shadow-subtle px-2 py-1.5 flex gap-2 text-sm select-none focus:outline-none focus:ring-2 focus:ring-brand-500 min-w-0",
-        !disableDrag && "hover:border-brand-300 dark:hover:border-brand-600",
-        !editing && (disableDrag ? "cursor-default" : "cursor-grab active:cursor-grabbing"),
-        task.status === "done" && "bg-brand-50 opacity-60 line-through",
-        variant === "scheduled" && "bg-brand-50 dark:bg-neutral-800",
-        (dueSoon || overdue) && "pr-8",
-        isDragging && "opacity-40",
-        editing && "cursor-text",
+        'group relative rounded-md border border-neutral-200/60 dark:border-neutral-700/60 bg-white dark:bg-neutral-800 shadow-subtle px-2 py-1.5 flex gap-2 text-sm select-none focus:outline-none focus:ring-2 focus:ring-brand-500 min-w-0',
+        !disableDrag && 'hover:border-brand-300 dark:hover:border-brand-600',
+        !editing && (disableDrag ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'),
+        task.status === 'done' && 'bg-brand-50 opacity-60 line-through',
+        variant === 'scheduled' && 'bg-brand-50 dark:bg-neutral-800',
+        (dueSoon || overdue) && 'pr-8',
+        isDragging && 'opacity-40',
+        editing && 'cursor-text',
         className
       )}
       tabIndex={0}
       onDoubleClick={() => setEditing(true)}
     >
       <Checkbox
-        checked={task.status === "done"}
-        onClick={() => updateTask(task.id, { status: task.status === "done" ? "pending" : "done" })}
+        checked={task.status === 'done'}
+        onClick={() => updateTask(task.id, { status: task.status === 'done' ? 'pending' : 'done' })}
         className="mt-0.5 shrink-0"
       />
       <div className="min-w-0 flex-1 overflow-hidden flex flex-col">
@@ -138,10 +132,10 @@ export function TaskCard({ task, variant = "backlog", compact, className, disabl
               onChange={(e) => setDraft(e.target.value)}
               onBlur={commitEdit}
               onKeyDown={(e) => {
-                if (e.key === "Escape") {
+                if (e.key === 'Escape') {
                   e.preventDefault();
                   cancelEdit();
-                } else if (e.key === "Enter") {
+                } else if (e.key === 'Enter') {
                   commitEdit();
                 }
               }}
@@ -151,16 +145,16 @@ export function TaskCard({ task, variant = "backlog", compact, className, disabl
         ) : (
           <div
             className={cn(
-              "font-medium",
+              'font-medium',
               isScheduled
                 ? slots <= 1
-                  ? "truncate"
+                  ? 'truncate'
                   : slots === 2
-                  ? "line-clamp-2"
+                  ? 'line-clamp-2'
                   : slots === 3
-                  ? "line-clamp-3"
+                  ? 'line-clamp-3'
                   : undefined
-                : "truncate"
+                : 'truncate'
             )}
             title={task.title}
           >
@@ -170,31 +164,31 @@ export function TaskCard({ task, variant = "backlog", compact, className, disabl
         {task.description && !compact && (
           <div
             className={cn(
-              "text-xs text-neutral-500 whitespace-pre-wrap break-words",
+              'text-xs text-neutral-500 whitespace-pre-wrap break-words',
               isScheduled
                 ? slots === 1
-                  ? "hidden"
+                  ? 'hidden'
                   : slots === 2
-                  ? "line-clamp-1"
+                  ? 'line-clamp-1'
                   : slots === 3
-                  ? "line-clamp-3"
+                  ? 'line-clamp-3'
                   : undefined
-                : "line-clamp-2"
+                : 'line-clamp-2'
             )}
           >
             {task.description}
           </div>
         )}
-        {variant === "backlog" && task.scheduledDate && (
+        {variant === 'backlog' && task.scheduledDate && (
           <div className="text-[10px] uppercase tracking-wide text-neutral-400 mt-0.5">
-            Programada {format(parseISO(task.scheduledDate), "EEE d", { locale: es })}
+            Programada {format(parseISO(task.scheduledDate), 'EEE d', { locale: es })}
             {task.scheduledTime && ` ${task.scheduledTime}`}
           </div>
         )}
       </div>
       {dueSoon && (
         <span className="absolute top-1 right-1 text-[10px] px-1 rounded bg-amber-200 text-amber-950 font-medium">
-          {daysLeft === 0 ? "Hoy" : `-${daysLeft}d`}
+          {daysLeft === 0 ? 'Hoy' : `-${daysLeft}d`}
         </span>
       )}
       {overdue && (
@@ -204,8 +198,8 @@ export function TaskCard({ task, variant = "backlog", compact, className, disabl
       )}
       <div
         className={cn(
-          "absolute transition-opacity top-0 right-0 translate-y-[-50%] flex gap-1 pr-1",
-          editing ? "opacity-100" : disableDrag ? "opacity-0" : "opacity-0 group-hover:opacity-100"
+          'absolute transition-opacity top-0 right-0 translate-y-[-50%] flex gap-1 pr-1',
+          editing ? 'opacity-100' : disableDrag ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
         )}
       >
         <button
@@ -219,9 +213,9 @@ export function TaskCard({ task, variant = "backlog", compact, className, disabl
           onClick={() => setShowDuePicker((s) => !s)}
           aria-label="Vencimiento"
           className={cn(
-            "h-5 w-5 rounded-full bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 flex items-center justify-center text-neutral-500 hover:text-brand-600",
-            dueSoon && "border-amber-400 text-amber-600",
-            overdue && "border-red-500 text-red-600"
+            'h-5 w-5 rounded-full bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 flex items-center justify-center text-neutral-500 hover:text-brand-600',
+            dueSoon && 'border-amber-400 text-amber-600',
+            overdue && 'border-red-500 text-red-600'
           )}
         >
           <Calendar className="h-3 w-3" />
@@ -235,14 +229,14 @@ export function TaskCard({ task, variant = "backlog", compact, className, disabl
           <div className="font-medium text-neutral-600 dark:text-neutral-300">Vencimiento</div>
           <input
             type="date"
-            value={task.dueDate || ""}
+            value={task.dueDate || ''}
             onChange={(e) => handleDueChange(e.target.value)}
             className="w-full rounded border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           {task.dueDate && (
             <button
               type="button"
-              onClick={() => handleDueChange("")}
+              onClick={() => handleDueChange('')}
               className="text-[10px] text-neutral-500 hover:text-red-600 hover:underline"
             >
               Quitar fecha

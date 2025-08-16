@@ -1,4 +1,4 @@
-import { addDays, differenceInCalendarDays, startOfWeek } from "date-fns";
+import { addDays, differenceInCalendarDays, startOfWeek } from 'date-fns';
 
 export function getWeekDays(base: Date, weekStartsOn: 0 | 1 = 1) {
   const start = startOfWeek(base, { weekStartsOn });

@@ -1,7 +1,7 @@
-import { v4 as uuid } from "uuid";
-import { Task, NewTaskInput } from "@/types/task";
+import { v4 as uuid } from 'uuid';
+import { Task, NewTaskInput } from '@/types/task';
 
-const STORAGE_KEY = "planubi.tasks.v1";
+const STORAGE_KEY = 'planubi.tasks.v1';
 
 type Listener = (tasks: Task[]) => void;
 
@@ -11,15 +11,15 @@ class TasksRepo {
   private channel: BroadcastChannel | null = null;
 
   constructor() {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       this.load();
       try {
-        this.channel = new BroadcastChannel("planubi_tasks");
+        this.channel = new BroadcastChannel('planubi_tasks');
       } catch {
         /* ignore */
       }
-      this.channel?.addEventListener("message", (ev) => {
-        if (ev.data?.type === "sync") {
+      this.channel?.addEventListener('message', (ev) => {
+        if (ev.data?.type === 'sync') {
           this.load();
           this.emit();
         }
@@ -30,9 +30,9 @@ class TasksRepo {
   private persist() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.tasks));
-      this.channel?.postMessage({ type: "sync" });
+      this.channel?.postMessage({ type: 'sync' });
     } catch (e) {
-      console.warn("Persistencia fallida", e);
+      console.warn('Persistencia fallida', e);
     }
   }
 
@@ -41,7 +41,7 @@ class TasksRepo {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) this.tasks = JSON.parse(raw);
     } catch (e) {
-      console.warn("Carga fallida", e);
+      console.warn('Carga fallida', e);
     }
   }
 
@@ -68,7 +68,7 @@ class TasksRepo {
       id: uuid(),
       title: data.title,
       description: data.description?.trim() || undefined,
-      status: "pending",
+      status: 'pending',
       scheduledDate: data.scheduledDate,
       scheduledTime: data.scheduledTime,
       dueDate: data.dueDate,

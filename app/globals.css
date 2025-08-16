@@ -15,17 +15,17 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: theme("colors.neutral.300");
+  background: theme('colors.neutral.300');
   border-radius: 6px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: theme("colors.neutral.400");
+  background: theme('colors.neutral.400');
 }
 body.dark ::-webkit-scrollbar-thumb {
-  background: theme("colors.neutral.700");
+  background: theme('colors.neutral.700');
 }
 body.dark ::-webkit-scrollbar-thumb:hover {
-  background: theme("colors.neutral.600");
+  background: theme('colors.neutral.600');
 }
 
 .line-clamp-2 {

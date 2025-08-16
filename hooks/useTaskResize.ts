@@ -1,6 +1,6 @@
-"use client";
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { Task } from "@/types/task";
+'use client';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { Task } from '@/types/task';
 
 interface Options {
   tasks: Task[];
@@ -18,13 +18,7 @@ interface ResizingState {
   currentSpan: number;
 }
 
-export function useTaskResize({
-  tasks,
-  updateTask,
-  hoursStart,
-  hoursLength,
-  slotHeightPx = 40,
-}: Options) {
+export function useTaskResize({ tasks, updateTask, hoursStart, hoursLength, slotHeightPx = 40 }: Options) {
   const totalSlots = hoursLength * 2;
   const [resizing, setResizing] = useState<ResizingState | null>(null);
   const session = useRef<{
@@ -38,7 +32,7 @@ export function useTaskResize({
   const parseStartIndex = useCallback(
     (scheduledTime: string | undefined) => {
       if (!scheduledTime) return { startIndex: 0, rowStart: 2 };
-      const [hh, mmStr] = scheduledTime.split(":");
+      const [hh, mmStr] = scheduledTime.split(':');
       const hour = parseInt(hh, 10);
       const minute = parseInt(mmStr, 10);
       let startIndex = (hour - hoursStart) * 2 + (minute >= 30 ? 1 : 0);
@@ -83,24 +77,21 @@ export function useTaskResize({
         const deltaSlots = Math.round(dy / slotHeightPx);
         const span = Math.max(
           1,
-          Math.min(
-            totalSlots - session.current.startIndex,
-            session.current.initialSpan + deltaSlots
-          )
+          Math.min(totalSlots - session.current.startIndex, session.current.initialSpan + deltaSlots)
         );
         session.current.currentSpan = span;
         setResizing((r) => (r && r.taskId === taskId ? { ...r, currentSpan: span } : r));
       };
       const onUp = () => {
-        window.removeEventListener("mousemove", onMove);
-        window.removeEventListener("mouseup", onUp);
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
         const finalSpan = session.current?.currentSpan ?? initialSpan;
         setResizing(null);
         session.current = null;
         updateTask(taskId, { durationMin: finalSpan * 30 });
       };
-      window.addEventListener("mousemove", onMove, { passive: true });
-      window.addEventListener("mouseup", onUp, { passive: true });
+      window.addEventListener('mousemove', onMove, { passive: true });
+      window.addEventListener('mouseup', onUp, { passive: true });
     },
     [parseStartIndex, tasks, totalSlots, slotHeightPx, updateTask]
   );

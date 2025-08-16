@@ -1,12 +1,12 @@
-"use client";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { TaskCard } from "./TaskCard";
-import { TaskInlineCreator } from "./TaskInlineCreator";
-import { useState, useRef, useEffect, useCallback, Fragment } from "react";
-import { useDnd } from "@/context/dnd";
-import { useTaskResize } from "@/hooks/useTaskResize";
-import { useTasks } from "@/hooks/useTasks";
+'use client';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { TaskCard } from './TaskCard';
+import { TaskInlineCreator } from './TaskInlineCreator';
+import { useState, useRef, useEffect, useCallback, Fragment } from 'react';
+import { useDnd } from '@/context/dnd';
+import { useTaskResize } from '@/hooks/useTaskResize';
+import { useTasks } from '@/hooks/useTasks';
 
 interface Props {
   days: Date[];
@@ -36,17 +36,15 @@ export function WeekGrid({ days }: Props) {
   function openCreator(dayISO: string, hour?: number, minute: number = 0) {
     let time: string | undefined = undefined;
     if (hour !== undefined) {
-      const hourStr = String(hour).padStart(2, "0");
-      const minuteStr = String(minute).padStart(2, "0");
+      const hourStr = String(hour).padStart(2, '0');
+      const minuteStr = String(minute).padStart(2, '0');
       time = `${hourStr}:${minuteStr}`;
     }
     setInlineCreator({ day: dayISO, time });
   }
 
   const recomputeOverflowWindow = useCallback(() => {
-    const nodes = document.querySelectorAll(
-      "[data-slot-has-tasks], [data-unscheduled-has-tasks], [data-task-overlay]"
-    );
+    const nodes = document.querySelectorAll('[data-slot-has-tasks], [data-unscheduled-has-tasks], [data-task-overlay]');
     const doc = document.documentElement;
     const viewportBottom = doc.clientHeight + window.scrollY;
     let maxBottom = 0;
@@ -81,18 +79,18 @@ export function WeekGrid({ days }: Props) {
       recomputeOverflowWindow();
       computeBadgeRect();
     };
-    el.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("scroll", onWindowScroll, { passive: true });
-    window.addEventListener("resize", onResize, { passive: true });
+    el.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', onWindowScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
 
     requestAnimationFrame(() => {
       recomputeOverflowWindow();
       computeBadgeRect();
     });
     return () => {
-      el.removeEventListener("scroll", onScroll);
-      window.removeEventListener("scroll", onWindowScroll);
-      window.removeEventListener("resize", onResize);
+      el.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', onWindowScroll);
+      window.removeEventListener('resize', onResize);
     };
   }, [recomputeOverflowWindow, computeBadgeRect]);
 
@@ -110,9 +108,7 @@ export function WeekGrid({ days }: Props) {
             key={d.toISOString()}
             className="p-2 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900"
           >
-            <div className="text-xs font-medium text-neutral-500">
-              {format(d, "EEE d", { locale: es })}
-            </div>
+            <div className="text-xs font-medium text-neutral-500">{format(d, 'EEE d', { locale: es })}</div>
           </div>
         ))}
       </div>
@@ -125,23 +121,20 @@ export function WeekGrid({ days }: Props) {
           }}
         >
           {/* Columna de horas */}
-          <div
-            className="border-b border-neutral-100 dark:border-neutral-800"
-            style={{ gridColumn: 1, gridRow: 1 }}
-          />
+          <div className="border-b border-neutral-100 dark:border-neutral-800" style={{ gridColumn: 1, gridRow: 1 }} />
           {HOURS.map((h, i) => (
             <div
               key={h}
               style={{ gridColumn: 1, gridRow: `${2 + i * 2} / span 2` }}
               className="border-b border-neutral-100 dark:border-neutral-800 text-[10px] text-neutral-400 flex items-start justify-end pr-1 pt-1 select-none"
             >
-              {String(h).padStart(2, "0")}:00
+              {String(h).padStart(2, '0')}:00
             </div>
           ))}
 
           {/* Columnas por día */}
           {days.map((day, dayIdx) => {
-            const iso = format(day, "yyyy-MM-dd");
+            const iso = format(day, 'yyyy-MM-dd');
             const dayTasks = tasks.filter((t) => t.scheduledDate === iso);
             const timed = dayTasks.filter((t) => t.scheduledTime);
             const unscheduled = dayTasks.filter((t) => !t.scheduledTime);
@@ -150,12 +143,10 @@ export function WeekGrid({ days }: Props) {
               <Fragment key={iso}>
                 {/* Overlay de bordes verticales de la columna */}
                 <div
-                  style={{ gridColumn: dayIdx + 2, gridRow: "1 / -1" }}
+                  style={{ gridColumn: dayIdx + 2, gridRow: '1 / -1' }}
                   className={
-                    "pointer-events-none border-l border-neutral-100 dark:border-neutral-800 " +
-                    (dayIdx === days.length - 1
-                      ? "border-r border-neutral-100 dark:border-neutral-800"
-                      : "")
+                    'pointer-events-none border-l border-neutral-100 dark:border-neutral-800 ' +
+                    (dayIdx === days.length - 1 ? 'border-r border-neutral-100 dark:border-neutral-800' : '')
                   }
                 />
 
@@ -164,21 +155,21 @@ export function WeekGrid({ days }: Props) {
                   style={{ gridColumn: dayIdx + 2, gridRow: 1 }}
                   className={`bg-neutral-50/60 dark:bg-neutral-800/40 border-b border-neutral-100 dark:border-neutral-800 transition-colors rounded-b-sm min-w-0 ${
                     hoveredSlot === `${iso}-unscheduled`
-                      ? "outline outline-1 outline-brand-400/70 bg-brand-50/60 dark:bg-brand-400/10 z-10"
-                      : ""
+                      ? 'outline outline-1 outline-brand-400/70 bg-brand-50/60 dark:bg-brand-400/10 z-10'
+                      : ''
                   }`}
                   onDragEnter={() => {
-                    if (dragging?.type === "task") setHoveredSlot(`${iso}-unscheduled`);
+                    if (dragging?.type === 'task') setHoveredSlot(`${iso}-unscheduled`);
                   }}
                   onDragOver={(e) => {
-                    if (dragging?.type === "task") e.preventDefault();
+                    if (dragging?.type === 'task') e.preventDefault();
                   }}
                   onDragLeave={(e) => {
                     if ((e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) return;
                     if (hoveredSlot === `${iso}-unscheduled`) setHoveredSlot(null);
                   }}
                   onDrop={(e) => {
-                    if (dragging?.type === "task") {
+                    if (dragging?.type === 'task') {
                       e.preventDefault();
                       updateTask(dragging.taskId, { scheduledDate: iso, scheduledTime: undefined });
                       endDrag();
@@ -187,14 +178,9 @@ export function WeekGrid({ days }: Props) {
                   }}
                 >
                   <div className="flex items-center justify-between mb-1 px-1 pt-2">
-                    <span className="text-[10px] uppercase tracking-wide text-neutral-400 font-medium">
-                      Sin hora
-                    </span>
+                    <span className="text-[10px] uppercase tracking-wide text-neutral-400 font-medium">Sin hora</span>
                     {inlineCreator && inlineCreator.day === iso && !inlineCreator.time ? null : (
-                      <button
-                        onClick={() => openCreator(iso)}
-                        className="text-[10px] text-brand-600 hover:underline"
-                      >
+                      <button onClick={() => openCreator(iso)} className="text-[10px] text-brand-600 hover:underline">
                         + Añadir
                       </button>
                     )}
@@ -202,9 +188,8 @@ export function WeekGrid({ days }: Props) {
                   <div
                     data-unscheduled-inner
                     data-unscheduled-has-tasks={
-                      unscheduled.length > 0 ||
-                      (inlineCreator && inlineCreator.day === iso && !inlineCreator.time)
-                        ? ""
+                      unscheduled.length > 0 || (inlineCreator && inlineCreator.day === iso && !inlineCreator.time)
+                        ? ''
                         : undefined
                     }
                     className="space-y-1 min-h-[40px] min-w-0 px-1 pb-1"
@@ -213,50 +198,44 @@ export function WeekGrid({ days }: Props) {
                       <TaskCard key={t.id} task={t} variant="backlog" />
                     ))}
                     {inlineCreator && inlineCreator.day === iso && !inlineCreator.time && (
-                      <TaskInlineCreator
-                        scheduledDate={iso}
-                        autoFocus
-                        onCreated={() => setInlineCreator(null)}
-                      />
+                      <TaskInlineCreator scheduledDate={iso} autoFocus onCreated={() => setInlineCreator(null)} />
                     )}
                   </div>
                 </div>
 
                 {/* Slots horarios (dropzones y sumar) */}
                 {HOURS.map((h, i) => {
-                  const hourStr = String(h).padStart(2, "0");
-                  const subSlots: Array<"00" | "30"> = ["00", "30"];
+                  const hourStr = String(h).padStart(2, '0');
+                  const subSlots: Array<'00' | '30'> = ['00', '30'];
                   return subSlots.map((mm, idx) => {
                     const timeStr = `${hourStr}:${mm}`;
                     const row = 2 + i * 2 + idx;
-                    const isCreator =
-                      inlineCreator && inlineCreator.day === iso && inlineCreator.time === timeStr;
+                    const isCreator = inlineCreator && inlineCreator.day === iso && inlineCreator.time === timeStr;
 
                     return (
                       <div
                         key={`${iso}-${h}-${mm}`}
                         style={{ gridColumn: dayIdx + 2, gridRow: row }}
                         className={`h-10 relative group/half px-1 py-1 min-w-0 ${
-                          idx === 1 ? "border-b border-neutral-100 dark:border-neutral-800" : ""
+                          idx === 1 ? 'border-b border-neutral-100 dark:border-neutral-800' : ''
                         } ${
                           hoveredSlot === `${iso}-${timeStr}`
-                            ? "outline outline-1 outline-brand-400/70 bg-brand-50/50 dark:bg-brand-400/10 z-10"
-                            : ""
+                            ? 'outline outline-1 outline-brand-400/70 bg-brand-50/50 dark:bg-brand-400/10 z-10'
+                            : ''
                         }`}
-                        data-slot-has-tasks={isCreator ? "" : undefined}
+                        data-slot-has-tasks={isCreator ? '' : undefined}
                         onDragEnter={() => {
-                          if (dragging?.type === "task") setHoveredSlot(`${iso}-${timeStr}`);
+                          if (dragging?.type === 'task') setHoveredSlot(`${iso}-${timeStr}`);
                         }}
                         onDragOver={(e) => {
-                          if (dragging?.type === "task") e.preventDefault();
+                          if (dragging?.type === 'task') e.preventDefault();
                         }}
                         onDragLeave={(e) => {
-                          if ((e.currentTarget as HTMLElement).contains(e.relatedTarget as Node))
-                            return;
+                          if ((e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) return;
                           if (hoveredSlot === `${iso}-${timeStr}`) setHoveredSlot(null);
                         }}
                         onDrop={(e) => {
-                          if (dragging?.type === "task") {
+                          if (dragging?.type === 'task') {
                             e.preventDefault();
                             updateTask(dragging.taskId, {
                               scheduledDate: iso,

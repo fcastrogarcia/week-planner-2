@@ -1,7 +1,7 @@
-"use client";
-import { useState, useRef, useEffect } from "react";
-import { useTasks } from "@/hooks/useTasks";
-import { cn } from "@/lib/utils";
+'use client';
+import { useState, useRef, useEffect } from 'react';
+import { useTasks } from '@/hooks/useTasks';
+import { cn } from '@/lib/utils';
 
 interface Props {
   scheduledDate?: string; // YYYY-MM-DD
@@ -15,13 +15,13 @@ interface Props {
 export function TaskInlineCreator({
   scheduledDate,
   scheduledTime,
-  placeholder = "Nueva tarea…",
+  placeholder = 'Nueva tarea…',
   autoFocus,
   onCreated,
   className,
 }: Props) {
   const { createTask } = useTasks();
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
   const ref = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -33,26 +33,26 @@ export function TaskInlineCreator({
     const title = value.trim();
     if (!title) return;
     createTask({ title, scheduledDate, scheduledTime });
-    setValue("");
+    setValue('');
     onCreated?.();
   }
 
   function handleBlur() {
-    if (value.trim() === "") {
+    if (value.trim() === '') {
       onCreated?.();
     }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       e.preventDefault();
-      setValue("");
+      setValue('');
       onCreated?.();
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className={cn("flex items-center gap-2 group", className)}>
+    <form onSubmit={handleSubmit} className={cn('flex items-center gap-2 group', className)}>
       <input
         ref={ref}
         value={value}

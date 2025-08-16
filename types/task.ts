@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   title: string;
   description?: string;
-  status: "pending" | "done";
+  status: 'pending' | 'done';
   scheduledDate?: string; // YYYY-MM-DD
   scheduledTime?: string; // HH:MM
   durationMin?: number; // duración en minutos (múltiplos de 30). Default: 30

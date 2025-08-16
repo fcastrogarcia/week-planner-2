@@ -1,10 +1,10 @@
-import "./globals.css";
-import type { ReactNode } from "react";
-import { DndProvider } from "@/context/dnd";
+import './globals.css';
+import type { ReactNode } from 'react';
+import { DndProvider } from '@/context/dnd';
 
 export const metadata = {
-  title: "Planubi",
-  description: "Planificador semanal sin fricción",
+  title: 'Planubi',
+  description: 'Planificador semanal sin fricción',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -1,12 +1,12 @@
-"use client";
-export const dynamic = "force-dynamic";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect } from "react";
-import { parseISO, startOfWeek, isValid, addDays, format } from "date-fns";
-import { es } from "date-fns/locale";
-import { BacklogPanel } from "@/components/BacklogPanel";
-import { WeekGrid } from "@/components/WeekGrid";
-import { useMemo } from "react";
+'use client';
+export const dynamic = 'force-dynamic';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
+import { parseISO, startOfWeek, isValid, addDays, format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { BacklogPanel } from '@/components/BacklogPanel';
+import { WeekGrid } from '@/components/WeekGrid';
+import { useMemo } from 'react';
 
 function parseWeekStart(start?: string | null) {
   if (!start) return startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -17,25 +17,22 @@ function parseWeekStart(start?: string | null) {
 
 function WeekPageInner() {
   const params = useSearchParams();
-  const weekStart = parseWeekStart(params.get("start"));
-  const days = useMemo(
-    () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
-    [weekStart]
-  );
+  const weekStart = parseWeekStart(params.get('start'));
+  const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
   useEffect(() => {
-    document.body.setAttribute("data-week-start", format(weekStart, "yyyy-MM-dd"));
+    document.body.setAttribute('data-week-start', format(weekStart, 'yyyy-MM-dd'));
     return () => {
-      document.body.removeAttribute("data-week-start");
+      document.body.removeAttribute('data-week-start');
     };
   }, [weekStart]);
 
   function shiftWeek(delta: number) {
     const target = addDays(weekStart, delta * 7);
     const qs = new URLSearchParams(window.location.search);
-    qs.set("start", format(target, "yyyy-MM-dd"));
-    window.history.pushState(null, "", `/week?${qs.toString()}`);
+    qs.set('start', format(target, 'yyyy-MM-dd'));
+    window.history.pushState(null, '', `/week?${qs.toString()}`);
     // Forzar refresh suave (Next no recarga automáticamente al manipular history manual)
-    window.dispatchEvent(new Event("popstate"));
+    window.dispatchEvent(new Event('popstate'));
   }
 
   return (

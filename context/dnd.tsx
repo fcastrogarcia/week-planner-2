@@ -1,8 +1,8 @@
-"use client";
-import { createContext, useContext, useState, ReactNode } from "react";
+'use client';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface DragDataTaskSlot {
-  type: "task";
+  type: 'task';
   taskId: string;
   from?: { date: string | null; time: string | null };
 }
@@ -26,6 +26,6 @@ export function DndProvider({ children }: { children: ReactNode }) {
 
 export function useDnd() {
   const v = useContext(Ctx);
-  if (!v) throw new Error("useDnd fuera de DndProvider");
+  if (!v) throw new Error('useDnd fuera de DndProvider');
   return v;
 }
