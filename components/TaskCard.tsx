@@ -16,18 +16,17 @@ interface Props {
   compact?: boolean;
   className?: string;
   disableDrag?: boolean;
+  suppressScheduledStamp?: boolean;
 }
 
-function createGhost(title: string) {
-  const ghost = document.createElement('div');
-  ghost.textContent = title;
-  ghost.style.cssText =
-    'position:fixed;top:-1000px;left:-1000px;max-width:220px;padding:4px 8px;font-size:12px;font-weight:500;border-radius:6px;background:#2563eb;color:white;box-shadow:0 4px 10px rgba(0,0,0,0.25);white-space:nowrap;pointer-events:none;font-family:inherit;';
-  document.body.appendChild(ghost);
-  return ghost;
-}
-
-export function TaskCard({ task, variant = 'backlog', compact, className, disableDrag }: Props) {
+export function TaskCard({
+  task,
+  variant = 'backlog',
+  compact,
+  className,
+  disableDrag,
+  suppressScheduledStamp,
+}: Props) {
   const { updateTask, deleteTask } = useTasks();
 
   const [showDuePicker, setShowDuePicker] = useState(false);
@@ -46,8 +45,7 @@ export function TaskCard({ task, variant = 'backlog', compact, className, disabl
   const dueSoon = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
   const overdue = due ? isPast(due) && daysLeft !== 0 : false;
   const isScheduled = variant === 'scheduled';
-  const slots =
-    task.scheduledDate && task.scheduledTime ? Math.max(1, Math.ceil(((task.durationMin ?? 30) as number) / 30)) : 1;
+  const slots = task.scheduledDate && task.scheduledTime ? slotsCount(task.durationMin ?? 30) : 1;
 
   const onDragStart = (e: React.DragEvent) => {
     if (editing || disableDrag) {
@@ -62,14 +60,13 @@ export function TaskCard({ task, variant = 'backlog', compact, className, disabl
       taskId: task.id,
       from: { date: task.scheduledDate || null, time: task.scheduledTime || null },
     });
-
     const ghost = createGhost(task.title);
-
     e.dataTransfer.setDragImage(ghost, Math.min(ghost.clientWidth, 220) / 2, ghost.clientHeight / 2);
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       if (ghost.parentNode) ghost.parentNode.removeChild(ghost);
-    }, 0);
+    });
   };
+
   const onDragEnd = () => endDrag();
   const isDragging = dragging?.taskId === task.id;
 
@@ -179,7 +176,7 @@ export function TaskCard({ task, variant = 'backlog', compact, className, disabl
             {task.description}
           </div>
         )}
-        {variant === 'backlog' && task.scheduledDate && (
+        {variant === 'backlog' && task.scheduledDate && !suppressScheduledStamp && (
           <div className="text-[10px] uppercase tracking-wide text-neutral-400 mt-0.5">
             Programada {format(parseISO(task.scheduledDate), 'EEE d', { locale: es })}
             {task.scheduledTime && ` ${task.scheduledTime}`}
@@ -246,4 +243,16 @@ export function TaskCard({ task, variant = 'backlog', compact, className, disabl
       )}
     </div>
   );
+}
+
+function createGhost(title: string) {
+  const ghost = document.createElement('div');
+  ghost.textContent = title;
+  ghost.style.cssText =
+    'position:fixed;top:-1000px;left:-1000px;max-width:220px;padding:4px 8px;font-size:12px;font-weight:500;border-radius:6px;background:#2563eb;color:white;box-shadow:0 4px 10px rgba(0,0,0,0.25);white-space:nowrap;pointer-events:none;font-family:inherit;';
+  document.body.appendChild(ghost);
+  return ghost;
+}
+function slotsCount(durationMin: number): number {
+  return Math.max(1, Math.ceil(durationMin / 30));
 }

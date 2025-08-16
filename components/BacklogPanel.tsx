@@ -38,7 +38,7 @@ export function BacklogPanel({ className }: Props) {
         {backlog
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
           .map((t) => (
-            <TaskCard key={t.id} task={t} variant="backlog" />
+            <TaskCard key={t.id} task={t} variant="backlog" suppressScheduledStamp />
           ))}
         {scheduledButPending.length > 0 && (
           <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
