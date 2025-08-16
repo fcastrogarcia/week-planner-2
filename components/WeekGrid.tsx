@@ -1,12 +1,14 @@
 'use client';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { GUTTER_WIDTH } from '@/constants/layout';
 import { TaskCard } from './TaskCard';
 import { TaskInlineCreator } from './TaskInlineCreator';
 import { useState, useRef, useEffect, useCallback, Fragment } from 'react';
 import { useDnd } from '@/context/dnd';
 import { useTaskResize } from '@/hooks/useTaskResize';
 import { useTasks } from '@/hooks/useTasks';
+import { WeekDaysHeader } from './WeekDaysHeader';
 
 interface Props {
   days: Date[];
@@ -100,23 +102,13 @@ export function WeekGrid({ days }: Props) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Encabezado de días */}
-      <div className="grid" style={{ gridTemplateColumns: `80px repeat(${days.length}, 1fr)` }}>
-        <div className="border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900" />
-        {days.map((d) => (
-          <div
-            key={d.toISOString()}
-            className="p-2 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900"
-          >
-            <div className="text-xs font-medium text-neutral-500">{format(d, 'EEE d', { locale: es })}</div>
-          </div>
-        ))}
-      </div>
+      {/* Encabezado de días reutilizable */}
+      <WeekDaysHeader days={days} includeGutter gutterWidth={GUTTER_WIDTH} className="sticky top-0 z-30" />
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto relative">
         <div
           className="grid"
           style={{
-            gridTemplateColumns: `80px repeat(${days.length}, 1fr)`,
+            gridTemplateColumns: `${GUTTER_WIDTH}px repeat(${days.length}, 1fr)`,
             gridTemplateRows: `auto repeat(${HOURS.length * 2}, 40px)`,
           }}
         >

@@ -6,6 +6,7 @@ import { parseISO, startOfWeek, isValid, addDays, format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { BacklogPanel } from '@/components/BacklogPanel';
 import { WeekGrid } from '@/components/WeekGrid';
+import { WeekCompact } from '@/components/WeekCompact';
 import { useMemo } from 'react';
 
 function parseWeekStart(start?: string | null) {
@@ -35,6 +36,15 @@ function WeekPageInner() {
     window.dispatchEvent(new Event('popstate'));
   }
 
+  const compact = params.get('view') === 'compact';
+  function toggleView() {
+    const qs = new URLSearchParams(window.location.search);
+    if (compact) qs.delete('view');
+    else qs.set('view', 'compact');
+    window.history.pushState(null, '', `/week?${qs.toString()}`);
+    window.dispatchEvent(new Event('popstate'));
+  }
+
   return (
     <div className="flex flex-1 min-h-0 w-full">
       <BacklogPanel className="w-80 border-r border-neutral-200 dark:border-neutral-800" />
@@ -57,8 +67,26 @@ function WeekPageInner() {
           <h2 className="font-medium text-sm text-neutral-600 dark:text-neutral-300">
             Semana de {format(weekStart, "d 'de' MMMM", { locale: es })}
           </h2>
+          <div className="ml-auto flex items-center gap-2">
+            <label className="text-[11px] text-neutral-500 dark:text-neutral-400">Vista</label>
+            <select
+              value={compact ? 'compact' : 'detailed'}
+              onChange={(e) => {
+                const val = e.target.value;
+                const qs = new URLSearchParams(window.location.search);
+                if (val === 'compact') qs.set('view', 'compact');
+                else qs.delete('view');
+                window.history.pushState(null, '', `/week?${qs.toString()}`);
+                window.dispatchEvent(new Event('popstate'));
+              }}
+              className="h-7 text-xs rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            >
+              <option value="detailed">Detallada</option>
+              <option value="compact">Compacta</option>
+            </select>
+          </div>
         </div>
-        <WeekGrid days={days} />
+        {compact ? <WeekCompact days={days} /> : <WeekGrid days={days} />}
       </div>
     </div>
   );
