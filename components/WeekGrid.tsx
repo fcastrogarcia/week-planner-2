@@ -102,8 +102,7 @@ export function WeekGrid({ days }: Props) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Encabezado de días reutilizable */}
-      <WeekDaysHeader days={days} includeGutter gutterWidth={GUTTER_WIDTH} className="sticky top-0 z-30" />
+      <WeekDaysHeader days={days} className="sticky top-0 z-30" />
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto relative">
         <div
           className="grid"

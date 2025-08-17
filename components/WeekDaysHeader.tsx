@@ -11,7 +11,6 @@ interface Props {
   /** Ancho del gutter izquierdo. */
   gutterWidth?: number;
   className?: string;
-  /** Si se desea hacer sticky se puede pasar clases externas (p.ej. sticky top-0). */
 }
 
 export function WeekDaysHeader({ days, includeGutter = true, gutterWidth = GUTTER_WIDTH, className = '' }: Props) {

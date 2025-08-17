@@ -17,7 +17,6 @@ interface Props {
   className?: string;
   disableDrag?: boolean;
   suppressScheduledStamp?: boolean;
-  forceSingleSlot?: boolean; // fuerza slots=1 (vista compacta)
 }
 
 export function TaskCard({
@@ -27,7 +26,6 @@ export function TaskCard({
   className,
   disableDrag,
   suppressScheduledStamp,
-  forceSingleSlot,
 }: Props) {
   const { updateTask, deleteTask } = useTasks();
 
@@ -47,7 +45,7 @@ export function TaskCard({
   const dueSoon = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
   const overdue = due ? isPast(due) && daysLeft !== 0 : false;
   const isScheduled = variant === 'scheduled';
-  const slots = forceSingleSlot ? 1 : task.scheduledDate && task.scheduledTime ? slotsCount(task.durationMin ?? 30) : 1;
+  const slots = task.scheduledDate && task.scheduledTime ? slotsCount(task.durationMin ?? 30) : 1;
 
   const onDragStart = (e: React.DragEvent) => {
     if (editing || disableDrag) {

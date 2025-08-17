@@ -1,6 +1,5 @@
 'use client';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { GUTTER_WIDTH } from '@/constants/layout';
 import { useTasks } from '@/hooks/useTasks';
 import { CompactTaskItem } from './CompactTaskItem';
@@ -16,7 +15,6 @@ interface Props {
  * - No muestra grilla de horas.
  * - Lista las tareas de cada día secuencialmente (con hora primero, luego sin hora).
  * - Sin drag & drop ni resize (se pasa disableDrag y no se montan handlers).
- * - Cada tarea ocupa la misma altura (forceSingleSlot).
  */
 export function WeekCompact({ days }: Props) {
   const { tasks } = useTasks();
@@ -35,7 +33,7 @@ export function WeekCompact({ days }: Props) {
 
   return (
     <div className="flex flex-col h-full">
-      <WeekDaysHeader days={days} includeGutter gutterWidth={GUTTER_WIDTH} className="sticky top-0 z-30 px-4" />
+      <WeekDaysHeader days={days} className="sticky top-0 z-30 px-4" />
       <div className="flex-1 min-w-0 overflow-auto py-4 px-4">
         <div className="grid gap-4" style={{ gridTemplateColumns: `72px repeat(${days.length}, 1fr)` }}>
           <div aria-hidden="true" />
