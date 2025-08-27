@@ -70,6 +70,7 @@ export function TaskCard({
   const onDragEnd = () => endDrag();
   const isDragging = dragging?.taskId === task.id;
 
+  /* Setea el draft inicial al valor de la tarea */
   useEffect(() => {
     if (editing) {
       setDraft(task.title);
